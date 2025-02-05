@@ -3,167 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIC-TOE-TIE</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>   
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #fce4ec;
-            text-align: center;
-        }
-        h1 {
-            color: #d81b60;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            background-color: white;
-            border: 2px solid #d81b60;
-            cursor: pointer;
-        }
-        .scoreboard {
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #d81b60;
-        }
-        #entry-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    </style>
+    <title>TIC-TOE-TIE 💖</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="entry-screen">
-        <h2>Enter Passcode to Play</h2>
-        <input type="password" id="passcode-input" placeholder="Enter passcode" />
-        <button onclick="checkPasscode()">Enter</button>
-    </div>
-    
-    <div id="game-area" style="display: none;">
-        <h1>TIC-TOE-TIE ❤️</h1>
-        <div class="board" id="board"></div>
-        <div class="scoreboard">
-            <p><strong>Player X Wins:</strong> <span id="xWins">0</span></p>
-            <p><strong>Player O Wins:</strong> <span id="oWins">0</span></p>
+    <div class="container">
+        <h1 class="header">💖 TIC-TOE-TIE 💖</h1>
+        <div class="gif-container">
+            <img src="./gif2.gif" alt="Valentine's GIF">
         </div>
-        <button onclick="resetGame()">Reset Game</button>
+
+        
+        <div class="entry">
+            <input type="text" id="player1" placeholder="Enter Player 1's Name 💖">
+            <input type="text" id="player2" placeholder="Enter Player 2's Name 💘">
+            <button id="start-btn">Start Game</button>
+        </div>
+
+        <div class="scoreboard" id="scoreboard" style="display:none;">
+            <p><span id="p1-name"></span>: <span id="p1-score">0</span> 💖</p>
+            <p><span id="p2-name"></span>: <span id="p2-score">0</span> 💘</p>
+        </div>
+
+      
+        <div class="game-board" style="display:none;">
+            <div class="row">
+                <div class="cell" onclick="makeMove(0)"></div>
+                <div class="cell" onclick="makeMove(1)"></div>
+                <div class="cell" onclick="makeMove(2)"></div>
+            </div>
+            <div class="row">
+                <div class="cell" onclick="makeMove(3)"></div>
+                <div class="cell" onclick="makeMove(4)"></div>
+                <div class="cell" onclick="makeMove(5)"></div>
+            </div>
+            <div class="row">
+                <div class="cell" onclick="makeMove(6)"></div>
+                <div class="cell" onclick="makeMove(7)"></div>
+                <div class="cell" onclick="makeMove(8)"></div>
+            </div>
+        </div>
+
+       
+        <button id="reset-btn" style="display:none;" onclick="resetGame()">Restart Game</button>
     </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "tic-toe-tie.firebaseapp.com",
-            databaseURL: "https://tic-toe-tie-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "tic-toe-tie",
-            storageBucket: "tic-toe-tie.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+    
+    <div id="heart-container"></div>
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let board = ["", "", "", "", "", "", "", "", ""];
-        let currentPlayer = "X";
-
-        const boardRef = db.ref("board");
-        const turnRef = db.ref("turn");
-
-        // Passcode system
-        function checkPasscode() {
-            let passcode = document.getElementById("passcode-input").value;
-            if (passcode === "1234") {  // Replace with your actual passcode
-                document.getElementById("entry-screen").style.display = "none";
-                document.getElementById("game-area").style.display = "block";
-                createBoard(); // Ensuring the board gets displayed when the game starts
-            } else {
-                alert("Incorrect passcode! Try again.");
-            }
-        }
-
-        function createBoard() {
-            let boardDiv = document.getElementById("board");
-            boardDiv.innerHTML = ""; // Clear existing board
-            board.forEach((cell, index) => {
-                let cellDiv = document.createElement("div");
-                cellDiv.classList.add("cell");
-                cellDiv.dataset.index = index;
-                cellDiv.textContent = cell;
-                cellDiv.addEventListener("click", makeMove);
-                boardDiv.appendChild(cellDiv);
-            });
-        }
-
-        function makeMove(event) {
-            let index = event.target.dataset.index;
-            if (board[index] === "") {
-                board[index] = currentPlayer;
-                boardRef.set(board);
-                turnRef.set(currentPlayer === "X" ? "O" : "X");
-            }
-        }
-
-        boardRef.on("value", snapshot => {
-            if (snapshot.exists()) {
-                board = snapshot.val();
-                updateBoardUI();
-                if (checkWinner()) {
-                    alert(currentPlayer + " Wins!");
-                    resetGame();
-                }
-            }
-        });
-
-        turnRef.on("value", snapshot => {
-            if (snapshot.exists()) {
-                currentPlayer = snapshot.val();
-            }
-        });
-
-        function updateBoardUI() {
-            let cells = document.querySelectorAll(".cell");
-            cells.forEach((cell, index) => {
-                cell.textContent = board[index];
-            });
-        }
-
-        function checkWinner() {
-            const winningCombos = [
-                [0,1,2], [3,4,5], [6,7,8],
-                [0,3,6], [1,4,7], [2,5,8],
-                [0,4,8], [2,4,6]
-            ];
-            return winningCombos.some(combination => {
-                let [a, b, c] = combination;
-                return board[a] && board[a] === board[b] && board[a] === board[c];
-            });
-        }
-
-        function resetGame() {
-            board = ["", "", "", "", "", "", "", "", ""];
-            boardRef.set(board);
-            turnRef.set("X");
-            createBoard(); // Reset the board visually too
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

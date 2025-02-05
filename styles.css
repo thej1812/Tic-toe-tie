@@ -1,95 +1,115 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300&display=swap');
-
 body {
-    background-color: #ffdde1; 
+    font-family: Arial, sans-serif;
+    background-color: #fbe6e6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+.container {
     text-align: center;
-    font-family: 'Poppins', sans-serif;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.heart-bg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: -1;
-}
-
-
-.heart-bg span {
-    position: absolute;
-    bottom: -20px;
-    background: rgba(255, 51, 102, 0.4);
-    width: 20px;
-    height: 20px;
-    display: block;
-    transform: rotate(-45deg);
-    animation: float-heart 5s infinite linear;
-}
-
-.heart-bg span::before,
-.heart-bg span::after {
-    content: "";
-    width: 20px;
-    height: 20px;
-    background: rgba(255, 51, 102, 0.4);
-    border-radius: 50%;
-    position: absolute;
-}
-
-.heart-bg span::before {
-    top: -10px;
-    left: 0;
-}
-
-.heart-bg span::after {
-    left: 10px;
-    top: 0;
-}
-
-
-@keyframes float-heart {
-    0% {
-        transform: translateY(0) rotate(-45deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-100vh) rotate(-45deg);
-        opacity: 0;
-    }
-}
-
-
-
-
-
-.gif-container {
-    text-align: center;
-    margin-top: 150px;
+.header {
+    font-size: 2em;
+    margin-bottom: 20px;
 }
 
 .gif-container img {
-    width: 250px; 
-    border-radius: 10px;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 10px;
 }
 
-
-.description {
-    font-size: 18px;
-    color: #b3005e;
-    text-align: center;
-    padding: 20px;
-    width: 60%;
-    margin: 10px auto;
-    
-    border-radius: 10px;
-    
-    position: relative;
-    animation: fadeIn 3s ease-in-out;
+.entry input {
+    padding: 10px;
+    margin: 10px;
+    border: 2px solid #f88;
+    border-radius: 5px;
 }
 
-@keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0px); }
+.entry button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f88;
+    color: white;
+    font-size: 1.1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.entry button:hover {
+    background-color: #f56;
+}
+
+.scoreboard p {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.game-board {
+    margin-top: 20px;
+}
+
+.row {
+    display: flex;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+    border: 2px solid #f88;
+    background-color: #fbe6e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button#reset-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f88;
+    color: white;
+    font-size: 1.1em;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+button#reset-btn:hover {
+    background-color: #f56;
+}
+
+/* Floating Hearts */
+#heart-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.heart {
+    position: absolute;
+    font-size: 2rem;
+    color: red;
+    animation: float 3s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
 }
