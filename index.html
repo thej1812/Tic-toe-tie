@@ -68,17 +68,7 @@
     </div>
 
     <script>
-        const correctPasscode = "1234";
-        function checkPasscode() {
-            let enteredPasscode = document.getElementById("passcode-input").value;
-            if (enteredPasscode === correctPasscode) {
-                document.getElementById("entry-screen").style.display = "none";
-                document.getElementById("game-area").style.display = "block";
-            } else {
-                alert("Wrong passcode! Try again.");
-            }
-        }
-        
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "tic-toe-tie.firebaseapp.com",
@@ -89,23 +79,35 @@
             appId: "YOUR_APP_ID"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "X";
-        const boardRef = database.ref("board");
-        const turnRef = database.ref("turn");
-        const xWinsRef = database.ref("xWins");
-        const oWinsRef = database.ref("oWins");
+
+        const boardRef = db.ref("board");
+        const turnRef = db.ref("turn");
+
+        // Passcode system
+        function checkPasscode() {
+            let passcode = document.getElementById("passcode-input").value;
+            if (passcode === "1234") {  // Replace with your actual passcode
+                document.getElementById("entry-screen").style.display = "none";
+                document.getElementById("game-area").style.display = "block";
+                createBoard(); // Ensuring the board gets displayed when the game starts
+            } else {
+                alert("Incorrect passcode! Try again.");
+            }
+        }
 
         function createBoard() {
             let boardDiv = document.getElementById("board");
-            boardDiv.innerHTML = "";
+            boardDiv.innerHTML = ""; // Clear existing board
             board.forEach((cell, index) => {
                 let cellDiv = document.createElement("div");
                 cellDiv.classList.add("cell");
                 cellDiv.dataset.index = index;
+                cellDiv.textContent = cell;
                 cellDiv.addEventListener("click", makeMove);
                 boardDiv.appendChild(cellDiv);
             });
@@ -126,8 +128,7 @@
                 updateBoardUI();
                 if (checkWinner()) {
                     alert(currentPlayer + " Wins!");
-                    updateWins(currentPlayer);
-                    resetBoard();
+                    resetGame();
                 }
             }
         });
@@ -157,28 +158,12 @@
             });
         }
 
-        function updateWins(player) {
-            if (player === "X") {
-                xWinsRef.transaction(count => (count || 0) + 1);
-            } else {
-                oWinsRef.transaction(count => (count || 0) + 1);
-            }
-        }
-
-        function resetBoard() {
+        function resetGame() {
             board = ["", "", "", "", "", "", "", "", ""];
             boardRef.set(board);
+            turnRef.set("X");
+            createBoard(); // Reset the board visually too
         }
-
-        xWinsRef.on("value", snapshot => {
-            document.getElementById("xWins").textContent = snapshot.val() || 0;
-        });
-
-        oWinsRef.on("value", snapshot => {
-            document.getElementById("oWins").textContent = snapshot.val() || 0;
-        });
-
-        createBoard();
     </script>
 </body>
 </html>
