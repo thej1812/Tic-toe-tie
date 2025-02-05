@@ -43,38 +43,61 @@
             font-size: 1.2em;
             color: #d81b60;
         }
+        #entry-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
-    <h1>TIC-TOE-TIE 💕</h1>
-    <div class="board" id="board"></div>
-    <div class="scoreboard">
-        <p><strong>Player X Wins:</strong> <span id="xWins">0</span></p>
-        <p><strong>Player O Wins:</strong> <span id="oWins">0</span></p>
+    <div id="entry-screen">
+        <h2>Enter Passcode to Play</h2>
+        <input type="password" id="passcode-input" placeholder="Enter passcode" />
+        <button onclick="checkPasscode()">Enter</button>
+    </div>
+    
+    <div id="game-area" style="display: none;">
+        <h1>TIC-TOE-TIE ❤️</h1>
+        <div class="board" id="board"></div>
+        <div class="scoreboard">
+            <p><strong>Player X Wins:</strong> <span id="xWins">0</span></p>
+            <p><strong>Player O Wins:</strong> <span id="oWins">0</span></p>
+        </div>
+        <button onclick="resetGame()">Reset Game</button>
     </div>
 
     <script>
-       // Firebase Configuration (Replace with your own)
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "tic-toe-tie.firebaseapp.com",
-    databaseURL: "https://tic-toe-tie-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    projectId: "tic-toe-tie",
-    storageBucket: "tic-toe-tie.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+        const correctPasscode = "1234";
+        function checkPasscode() {
+            let enteredPasscode = document.getElementById("passcode-input").value;
+            if (enteredPasscode === correctPasscode) {
+                document.getElementById("entry-screen").style.display = "none";
+                document.getElementById("game-area").style.display = "block";
+            } else {
+                alert("Wrong passcode! Try again.");
+            }
+        }
+        
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "tic-toe-tie.firebaseapp.com",
+            databaseURL: "https://tic-toe-tie-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "tic-toe-tie",
+            storageBucket: "tic-toe-tie.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "X";
-        let xWins = 0, oWins = 0;
-        const boardRef = db.ref("board");
-        const turnRef = db.ref("turn");
+        const boardRef = database.ref("board");
+        const turnRef = database.ref("turn");
+        const xWinsRef = database.ref("xWins");
+        const oWinsRef = database.ref("oWins");
 
         function createBoard() {
             let boardDiv = document.getElementById("board");
@@ -103,6 +126,7 @@ const database = firebase.database();
                 updateBoardUI();
                 if (checkWinner()) {
                     alert(currentPlayer + " Wins!");
+                    updateWins(currentPlayer);
                     resetBoard();
                 }
             }
@@ -133,10 +157,26 @@ const database = firebase.database();
             });
         }
 
+        function updateWins(player) {
+            if (player === "X") {
+                xWinsRef.transaction(count => (count || 0) + 1);
+            } else {
+                oWinsRef.transaction(count => (count || 0) + 1);
+            }
+        }
+
         function resetBoard() {
             board = ["", "", "", "", "", "", "", "", ""];
             boardRef.set(board);
         }
+
+        xWinsRef.on("value", snapshot => {
+            document.getElementById("xWins").textContent = snapshot.val() || 0;
+        });
+
+        oWinsRef.on("value", snapshot => {
+            document.getElementById("oWins").textContent = snapshot.val() || 0;
+        });
 
         createBoard();
     </script>
