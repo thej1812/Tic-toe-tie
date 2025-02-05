@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIC-TOE-TIE</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>   
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #fce4ec;
+            text-align: center;
+        }
+        h1 {
+            color: #d81b60;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            background-color: white;
+            border: 2px solid #d81b60;
+            cursor: pointer;
+        }
+        .scoreboard {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #d81b60;
+        }
+    </style>
+</head>
+<body>
+    <h1>TIC-TOE-TIE 💕</h1>
+    <div class="board" id="board"></div>
+    <div class="scoreboard">
+        <p><strong>Player X Wins:</strong> <span id="xWins">0</span></p>
+        <p><strong>Player O Wins:</strong> <span id="oWins">0</span></p>
+    </div>
+
+    <script>
+       // Firebase Configuration (Replace with your own)
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "tic-toe-tie.firebaseapp.com",
+    databaseURL: "https://tic-toe-tie-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "tic-toe-tie",
+    storageBucket: "tic-toe-tie.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let xWins = 0, oWins = 0;
+        const boardRef = db.ref("board");
+        const turnRef = db.ref("turn");
+
+        function createBoard() {
+            let boardDiv = document.getElementById("board");
+            boardDiv.innerHTML = "";
+            board.forEach((cell, index) => {
+                let cellDiv = document.createElement("div");
+                cellDiv.classList.add("cell");
+                cellDiv.dataset.index = index;
+                cellDiv.addEventListener("click", makeMove);
+                boardDiv.appendChild(cellDiv);
+            });
+        }
+
+        function makeMove(event) {
+            let index = event.target.dataset.index;
+            if (board[index] === "") {
+                board[index] = currentPlayer;
+                boardRef.set(board);
+                turnRef.set(currentPlayer === "X" ? "O" : "X");
+            }
+        }
+
+        boardRef.on("value", snapshot => {
+            if (snapshot.exists()) {
+                board = snapshot.val();
+                updateBoardUI();
+                if (checkWinner()) {
+                    alert(currentPlayer + " Wins!");
+                    resetBoard();
+                }
+            }
+        });
+
+        turnRef.on("value", snapshot => {
+            if (snapshot.exists()) {
+                currentPlayer = snapshot.val();
+            }
+        });
+
+        function updateBoardUI() {
+            let cells = document.querySelectorAll(".cell");
+            cells.forEach((cell, index) => {
+                cell.textContent = board[index];
+            });
+        }
+
+        function checkWinner() {
+            const winningCombos = [
+                [0,1,2], [3,4,5], [6,7,8],
+                [0,3,6], [1,4,7], [2,5,8],
+                [0,4,8], [2,4,6]
+            ];
+            return winningCombos.some(combination => {
+                let [a, b, c] = combination;
+                return board[a] && board[a] === board[b] && board[a] === board[c];
+            });
+        }
+
+        function resetBoard() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            boardRef.set(board);
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

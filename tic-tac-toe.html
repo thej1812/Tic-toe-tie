@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Tic-Tac-Toe (XOXO Game)</h1>
+    <div id="tic-tac-toe-board">
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button><br>
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button><br>
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button>
+        <button onclick="play(this)">-</button>
+    </div>
+    <script>
+        let turn = "X";
+        function play(button) {
+            if (button.innerText === "-") {
+                button.innerText = turn;
+                turn = turn === "X" ? "O" : "X";
+            }
+        }
+    </script>
+</body>
+</html>
